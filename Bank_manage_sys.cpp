@@ -27,6 +27,9 @@ class Bank{
     void delUser();
     void allRecord();
     void showPayments();
+    void user_balance();
+    void withdraw_atm();
+    void check_detail();
 };
 void Bank::menu(){
     start:
@@ -148,21 +151,24 @@ void Bank::bank_management(){
 void Bank::atm_management(){
     start:
     int choice;
-    cout<<"_____ATM management system_____"<<endl<<endl;
+    cout<<endl<<endl<<"_____ATM management system_____"<<endl<<endl;
     cout<<"1.User login & check balance"<<endl;
     cout<<"2.Withdraw amount"<<endl;
     cout<<"3.Account details"<<endl;
-    cout<<"4.Go back"<<endl;
+    cout<<"4.Go back"<<endl<<endl;
     cout<<"enter your choice : ";
     cin>>choice;   
     switch(choice){
         case 1:{
+            user_balance();
             break;
         }
         case 2:{
+            withdraw_atm();
             break;
         }
         case 3:{
+            check_detail();
             break;
         }
         case 4:{
@@ -424,7 +430,7 @@ void Bank::payment(){
        rename("bank1.txt","bank.txt");
        if(found==1){
           file.open("bill.txt",ios::app|ios::out);
-          file<<endl<<t_id<<" "<<b_name<<" "<<amount<<" "<<timeString;
+          file<<endl<<t_id<<" "<<b_name<<" "<<amount<<" "<<timeString<<endl;
           file.close();
           cout<<endl<<endl<<b_name<<" bill payment successfully "<<endl;
        }
@@ -570,16 +576,17 @@ void Bank::showPayments(){
     fstream file;
     int found = 0;
     float amount;
-    string time ;
+    string a, b ,d;
+    int c,e;
     file.open("bill.txt",ios::in);
     if(!file){
         cout<<endl<<"file opening error"<<endl;
     }
     else{
-        file>>id>>name>>amount>>time;
+        file>>id>>name>>amount>>a>>b>>c>>d>>e;
         while(!file.eof()){
-            cout<<endl<<id<<" "<<name<<" "<<amount<<" "<<time<<endl;
-            file>>id>>name>>amount>>time;
+            cout<<endl<<id<<" "<<name<<" "<<amount<<" "<<a<<" "<<b<<" "<<c<<" "<<d<<" "<<e<<endl;
+            file>>id>>name>>amount>>a>>b>>c>>d>>e;
             found++;
         }
         file.close();
@@ -588,6 +595,116 @@ void Bank::showPayments(){
         }
         else{
             cout<<endl<<"data fetched successfully"<<endl;
+        }
+    }
+}
+void Bank::user_balance(){
+    fstream file;
+    int found = 0;
+    string n;
+    int p;
+    cout<<endl<<endl<<"-----login with your credentials-----"<<endl<<endl;
+    cout<<endl<<"enter your name : ";
+    cin>>n;
+    cout<<endl<<"enter your pin: ";
+    cin>>p;
+    file.open("bank.txt",ios::in);
+    if(!file){
+        cout<<endl<<"file opening error"<<endl;
+    }
+    else{
+        file>>id>>name>>f_name>>pin>>pass>>ph_No>>balance;
+        while(!file.eof()){
+            if(n==name && p==pin){
+                cout<<endl<<"your balance is : "<<balance<<endl;
+                found ++;
+            }
+            file>>id>>name>>f_name>>pin>>pass>>ph_No>>balance;
+        }
+        file.close();
+        if(found==0){
+            cout<<endl<<"Sorry ! data does not match"<<endl;
+        }
+    }
+}
+void Bank::withdraw_atm(){
+    fstream file,file1;
+    int i ,p;
+    string pa;
+    int found = 0;
+    float deb;
+    cout<<endl<<"-----Withdraw Amount-----"<<endl<<endl;
+    file.open("bank.txt",ios::in);
+    if(!file){
+        cout<<endl<<"file opening error"<<endl;
+    }
+    else{
+        cout<<endl<<"enter your user id : ";
+        cin>>i;
+        cout<<endl<<"enter your pin : ";
+        cin>>p;
+        cout<<endl<<"enter your password : ";
+        cin>>pa;
+        file1.open("bank1.txt",ios::app|ios::out);
+        file>>id>>name>>f_name>>pin>>pass>>ph_No>>balance;
+        while(!file.eof()){
+            if(i==id && p==pin && pa==pass){
+                cout<<endl<<endl<<"enter the amount for withdraw : ";
+                cin>>deb;
+                if(deb<=balance){
+                    balance-=deb;
+                    file1<<endl<<" "<<id<<" "<<name<<" "<<f_name<<" "<<pin<<" "<<pass<<" "<<ph_No<<" "<<balance<<endl;
+                    cout<<endl<<endl<<"your amount "<<deb<<" successfully withdrawn......";
+                    cout<<endl<<endl<<"your current balance is : "<<balance<<endl<<endl;
+                }
+                else{
+                    cout<<endl<<endl<<"invalid amount and your balance is : "<<balance<<endl;
+                    file1<<endl<<" "<<id<<" "<<name<<" "<<f_name<<" "<<pin<<" "<<pass<<" "<<ph_No<<" "<<balance<<endl;
+                }
+                found++; 
+            }
+            else{
+                file1<<endl<<" "<<id<<" "<<name<<" "<<f_name<<" "<<pin<<" "<<pass<<" "<<ph_No<<" "<<balance<<endl;
+            }
+            file>>id>>name>>f_name>>pin>>pass>>ph_No>>balance;
+        }
+        file.close();
+        file1.close();
+        remove("bank.txt");
+        rename("bank1.txt","bank.txt");
+        if(found==0){
+            cout<<endl<<"User id can not found"<<endl;
+        }
+    }
+}
+void Bank::check_detail(){
+    cout<<endl<<endl<<"------check your details------"<<endl<<endl;
+    fstream file;
+    int i ,p;
+    string pa;
+    int found = 0;
+    file.open("bank.txt",ios::in);
+    if(!file){
+        cout<<endl<<"file opening error"<<endl;
+    }
+    else{
+        cout<<endl<<"enter your user id : ";
+        cin>>i;
+        cout<<endl<<"enter your pin : ";
+        cin>>p;
+        cout<<endl<<"enter your password : ";
+        cin>>pa;
+        file>>id>>name>>f_name>>pin>>pass>>ph_No>>balance;
+        while(!file.eof()){
+            if(i==id && p==pin && pa==pass){
+                cout<<endl<<" "<<id<<" "<<name<<" "<<f_name<<" "<<pin<<" "<<pass<<" "<<ph_No<<" "<<balance<<endl<<endl;
+                found++; 
+            }
+            file>>id>>name>>f_name>>pin>>pass>>ph_No>>balance;
+        }
+        file.close();
+        if(found==0){
+            cout<<endl<<"Invalid Credentials"<<endl;
         }
     }
 }
